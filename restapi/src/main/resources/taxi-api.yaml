@@ -1,0 +1,778 @@
+swagger: '2.0'
+
+info:
+  version: "0.1"
+  title: Taxi API V 1.0.3
+  description: |
+    This document describes the REST API and resources of the Taxi Project.
+
+basePath: "/taxiservice"
+schemes: ["http", "https"]
+produces:
+  - application/json
+
+paths:
+
+  # ===================================================================================================
+  # Taxi API
+  # ===================================================================================================
+
+  /taxis:
+    get:
+      summary: Search / filter for taxis and returns a list of taxis.
+      operationId: getTaxis
+      description: |
+
+        The taxi search API allows you to execute a query and get back a list of all taxis.
+
+      responses:
+        200:
+          description: Returns a list of Taxis.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaxiDefinition'
+          examples:
+              application/json:
+              text/plain: |
+                [
+                  {
+                    "id": "1",
+                    "model": "BMW",
+                    "consumption": "25",
+                    }
+                  }
+                  ,
+                  {
+                    "id": "2",
+                    "model": "AUDI",
+                    "consumption": "30",
+                    }
+                  }
+                ]
+        default:
+          description: An unexpected error occured while trying to execute the search query.
+          schema:
+            $ref: '#/definitions/Error'
+
+    post:
+      summary: Submit a new taxi
+      description: Submits a new taxi for further processing.
+      operationId: submitTaxi
+      parameters:
+        - name: taxi
+          in: body
+          description: Taxi definition, which should be submitted for further processing.
+          required: true
+          schema:
+            $ref: '#/definitions/TaxiDefinition'
+      responses:
+        201:
+          description: The taxi was submitted successfully. The response contains the alpha-numeric unique id of the created taxi object.
+          schema:
+            type: string
+          examples:
+              application/json:
+              text/plain: |
+                {
+                  "id": "4"
+                }
+        default:
+          description: An unexpected error occured while trying to submit a new taxi.
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /taxis/{id}:
+    get:
+      summary: Get a single taxi
+      description: Returns a single taxi by id.
+      operationId: getTaxiById
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the taxi to fetch
+          required: true
+          type: string
+      responses:
+        200:
+          description: A taxi was found by passed id, the taxi information is returned in the response body.
+          schema:
+            $ref: '#/definitions/TaxiDefinition'
+          examples:
+            application/json:
+            text/plain: |
+                {
+                  "id": "1",
+                  "model": "BMW",
+                  "consumption": "25",
+                }
+        403:
+          description: You are not allowed to get the taxi with the passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: No taxi was found by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occured while trying to fetch the taxi by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+
+    put:
+      summary: Updates a single taxi
+      description: Updates a single taxi by id. This method can also be used to update the state of an existing taxi.
+      operationId: updateTaxiById
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the taxi to update
+          required: true
+          type: string
+        - name: taxi
+          in: body
+          description: Taxi definition, which should be submitted for further processing.
+          required: true
+          schema:
+            $ref: '#/definitions/TaxiDefinition'
+      responses:
+        204:
+          description: The taxi with passed id was updated.
+        403:
+          description: You are not allowed to update the taxi with the passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: No taxi was found for update by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occured while trying to update the taxi by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+
+
+    delete:
+      summary: Delete a single taxi
+      description: Deletes a single taxi by id.
+      operationId: deleteTaxiById
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the taxi to delete
+          required: true
+          type: string
+      responses:
+        204:
+          description: The taxi with passed id was deleted.
+        403:
+          description: You are not allowed to delete the taxi with the passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: No taxi was found for deletion by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occured while trying to delete the taxi by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+
+  /drivers:
+    get:
+      summary: Search / filter for drivers and returns a list of drivers.
+      operationId: getDrivers
+      description: |
+
+        The driver search API allows you to execute a query and get back a list of all drivers.
+
+      responses:
+        200:
+          description: Returns a list of Drivers.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/DriverDefinition'
+          examples:
+              application/json:
+              text/plain: |
+                [
+                  {
+                    "id": "1",
+                    "firstname": "Will",
+                    "surename": "Smith",
+                    "ownerOfTaxis": ["1","2"]
+                  }
+                  ,
+                  {
+                    "id": "2",
+                    "firstname": "Brad",
+                    "surename": "Pitt",
+                    "ownerOfTaxis": ["3","4"]
+                  }
+                ]
+        default:
+          description: An unexpected error occured while trying to execute the search query.
+          schema:
+            $ref: '#/definitions/Error'
+
+    post:
+      summary: Submit a new driver
+      description: Submits a new driver for further processing.
+      operationId: submitDriver
+      parameters:
+        - name: driver
+          in: body
+          description: Driver definition, which should be submitted for further processing.
+          required: true
+          schema:
+            $ref: '#/definitions/DriverDefinition'
+      responses:
+        201:
+          description: The driver was submitted successfully. The response contains the alpha-numeric unique id of the created driver object.
+          schema:
+            type: string
+          examples:
+              application/json:
+              text/plain: |
+                {
+                  "id": "4"
+                }
+        default:
+          description: An unexpected error occured while trying to submit a new driver.
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /drivers/{id}:
+    get:
+      summary: Get a single driver
+      description: Returns a single driver by id.
+      operationId: getDriverById
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the driver to fetch
+          required: true
+          type: string
+      responses:
+        200:
+          description: A driver was found by passed id, the driver information is returned in the response body.
+          schema:
+            $ref: '#/definitions/DriverDefinition'
+          examples:
+            application/json:
+            text/plain: |
+                {
+                  "id": "1",
+                  "firstname": "Tom",
+                  "surename": "Cruise",
+                  "ownerOfTaxis": ["5"]
+                }
+        403:
+          description: You are not allowed to get the driver with the passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: No driver was found by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occured while trying to fetch the driver by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+
+    put:
+      summary: Updates a single driver
+      description: Updates a single driver by id. This method can also be used to update the state of an existing driver.
+      operationId: updateDriverById
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the driver to update
+          required: true
+          type: string
+        - name: driver
+          in: body
+          description: Driver definition, which should be submitted for further processing.
+          required: true
+          schema:
+            $ref: '#/definitions/DriverDefinition'
+      responses:
+        204:
+          description: The driver with passed id was updated.
+        403:
+          description: You are not allowed to update the driver with the passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: No driver was found for update by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occured while trying to update the driver by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+
+
+    delete:
+      summary: Delete a single driver
+      description: Deletes a single driver by id.
+      operationId: deleteDriverById
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the driver to delete
+          required: true
+          type: string
+      responses:
+        204:
+          description: The driver with passed id was deleted.
+        403:
+          description: You are not allowed to delete the driver with the passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: No driver was found for deletion by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occured while trying to delete the driver by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /customers:
+    get:
+      summary: Search / filter for customers and returns a list of customers.
+      operationId: getCustomers
+      description: |
+
+        The customer search API allows you to execute a query and get back a list of all customers.
+
+      responses:
+        200:
+          description: Returns a list of Customers.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CustomerDefinition'
+          examples:
+              application/json:
+              text/plain: |
+                [
+                  {
+                    "id": "1"
+                    "firstname": "Ang",
+                    "lastname": "Jolie"
+                  }
+                  ,
+                  {
+                    "id": "2",
+                    "firstname": "Jen",
+                    "lastname": "Aniston"
+                  }
+                ]
+        default:
+          description: An unexpected error occured while trying to execute the search query.
+          schema:
+            $ref: '#/definitions/Error'
+
+    post:
+      summary: Submit a new customer
+      description: Submits a new customer for further processing.
+      operationId: submitCustomer
+      parameters:
+        - name: customer
+          in: body
+          description: Customer definition, which should be submitted for further processing.
+          required: true
+          schema:
+            $ref: '#/definitions/CustomerDefinition'
+      responses:
+        201:
+          description: The customer was submitted successfully. The response contains the alpha-numeric unique id of the created customer object.
+          schema:
+            type: string
+          examples:
+              application/json:
+              text/plain: |
+                {
+                  "id": "4"
+                }
+        default:
+          description: An unexpected error occured while trying to submit a new customer.
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /customers/{id}:
+    get:
+      summary: Get a single customer
+      description: Returns a single customer by id.
+      operationId: getCustomerById
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the customer to fetch
+          required: true
+          type: string
+      responses:
+        200:
+          description: A customer was found by passed id, the customer information is returned in the response body.
+          schema:
+            $ref: '#/definitions/CustomerDefinition'
+          examples:
+            application/json:
+            text/plain: |
+                {
+                  "id": "1",
+                  "firstname": "Leo",
+                  "lastname": "DiCaprio"
+                }
+        403:
+          description: You are not allowed to get the customer with the passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: No customer was found by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occured while trying to fetch the customer by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+
+    put:
+      summary: Updates a single customer
+      description: Updates a single customer by id. This method can also be used to update the state of an existing customer.
+      operationId: updateCustomerById
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the customer to update
+          required: true
+          type: string
+        - name: customer
+          in: body
+          description: Customer definition, which should be submitted for further processing.
+          required: true
+          schema:
+            $ref: '#/definitions/CustomerDefinition'
+      responses:
+        204:
+          description: The customer with passed id was updated.
+        403:
+          description: You are not allowed to update the customer with the passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: No customer was found for update by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occured while trying to update the customer by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+
+
+    delete:
+      summary: Delete a single customer
+      description: Deletes a single customer by id.
+      operationId: deleteCustomerById
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the customer to delete
+          required: true
+          type: string
+      responses:
+        204:
+          description: The customer with passed id was deleted.
+        403:
+          description: You are not allowed to delete the customer with the passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: No customer was found for deletion by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occured while trying to delete the customer by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /rides:
+    get:
+      summary: Search / filter for rides and returns a list of rides.
+      operationId: getRides
+      description: |
+
+        The ride search API allows you to execute a query and get back a list of all rides.
+
+      responses:
+        200:
+          description: Returns a list of Rides.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/RideDefinition'
+          examples:
+              application/json:
+              text/plain: |
+                [
+                  {
+                    "id": "1"
+                    "firstname": "Ang",
+                    "lastname": "Jolie"
+                  },
+                  {
+                    "id": "2",
+                    "firstname": "Jen",
+                    "lastname": "Aniston"
+                  }
+                ]
+        default:
+          description: An unexpected error occured while trying to execute the search query.
+          schema:
+            $ref: '#/definitions/Error'
+
+    post:
+      summary: Submit a new ride
+      description: Submits a new ride for further processing.
+      operationId: submitRide
+      parameters:
+        - name: ride
+          in: body
+          description: Ride definition, which should be submitted for further processing.
+          required: true
+          schema:
+            $ref: '#/definitions/RideDefinition'
+      responses:
+        201:
+          description: The ride was submitted successfully. The response contains the alpha-numeric unique id of the created ride object.
+          schema:
+            type: string
+          examples:
+              application/json:
+              text/plain: |
+                {
+                  "id": "4"
+                }
+        default:
+          description: An unexpected error occured while trying to submit a new ride.
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /rides/{id}:
+    get:
+      summary: Get a single ride
+      description: Returns a single ride by id.
+      operationId: getRideById
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the ride to fetch
+          required: true
+          type: string
+      responses:
+        200:
+          description: A ride was found by passed id, the ride information is returned in the response body.
+          schema:
+            $ref: '#/definitions/RideDefinition'
+          examples:
+            application/json:
+            text/plain: |
+                {
+                  "id": "3",
+                  "firstname": "Leo",
+                  "surename": "DiCaprio"
+                }
+        403:
+          description: You are not allowed to get the ride with the passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: No ride was found by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occured while trying to fetch the ride by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+
+    put:
+      summary: Updates a single ride
+      description: Updates a single ride by id. This method can also be used to update the state of an existing ride.
+      operationId: updateRideById
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the ride to update
+          required: true
+          type: string
+        - name: ride
+          in: body
+          description: Ride definition, which should be submitted for further processing.
+          required: true
+          schema:
+            $ref: '#/definitions/RideDefinition'
+      responses:
+        204:
+          description: The ride with passed id was updated.
+        403:
+          description: You are not allowed to update the ride with the passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: No ride was found for update by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occured while trying to update the ride by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+
+
+    delete:
+      summary: Delete a single ride
+      description: Deletes a single ride by id.
+      operationId: deleteRideById
+      parameters:
+        - name: id
+          in: path
+          description: Unique id of the ride to delete
+          required: true
+          type: string
+      responses:
+        204:
+          description: The ride with passed id was deleted.
+        403:
+          description: You are not allowed to delete the ride with the passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        404:
+          description: No ride was found for deletion by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+        default:
+          description: An unexpected error occured while trying to delete the ride by passed id.
+          schema:
+            $ref: '#/definitions/Error'
+
+
+# ===================================================================================================
+# MODEL DEFINITIONS
+# ===================================================================================================
+
+definitions:
+
+
+  # Taxi definitions
+  # ---------------------------------------------------------------------------------------------------
+
+  TaxiDefinition:
+    properties:
+      id:
+        description: Id of the taxi.
+        type: string
+      model:
+        description: Model of the taxi.
+        type: string
+      consumption:
+        description: The fuel consumption of the taxi per hour.
+        type: number
+        format: float
+
+
+  # Driver definitions
+  # ---------------------------------------------------------------------------------------------------
+
+  DriverDefinition:
+    properties:
+      id:
+        description: Id of the taxi.
+        type: string
+      firstname:
+        description: Firstname of the driver.
+        type: string
+      surename:
+        description: Lastname of the driver.
+        type: string
+      ownerOfTaxis:
+        description: IDs of that taxis that belongs to the driver.
+        type: array
+        items:
+          type: string
+
+
+  # Customer definitions
+  # ---------------------------------------------------------------------------------------------------
+
+  CustomerDefinition:
+    properties:
+      id:
+        description: Id of the taxi.
+        type: string
+      firstname:
+        description: Firstname of the customer.
+        type: string
+      surename:
+        description: Lastname of the customer.
+        type: string
+
+
+  # Ride definitions
+  # ---------------------------------------------------------------------------------------------------
+
+  RideDefinition:
+    properties:
+      id:
+        description: Id of the taxi.
+        type: string
+      taxi_id:
+        description: Id of the taxi.
+        type: string
+      departure:
+        $ref: '#/definitions/GPSPoint'
+      destination:
+        $ref: '#/definitions/GPSPoint'
+      starttime:
+        type: string
+        description: The date and time when the ride started.
+      endtime:
+        type: string
+        description: The date and time when the ride ended.
+
+  # Departure definitions
+  # ---------------------------------------------------------------------------------------------------
+
+  GPSPoint:
+    properties:
+      latitude:
+        description: Latitude Number.
+        type: number
+        format: float
+      longitude:
+        description: Longitude Number.
+        type: number
+        format: float
+
+  # Error definitions
+  # ---------------------------------------------------------------------------------------------------
+
+  Error:
+    properties:
+      code:
+        description: The unique error code.
+        type: integer
+        format: int32
+      message:
+        description: The error message.
+        type: string
+      #fields:
+      #  description: The fields containing / causing an error.
+      #  type: string
